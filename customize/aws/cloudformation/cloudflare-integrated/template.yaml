@@ -1,0 +1,189 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AnythingLLM stack with Cloudflare integration
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Instance Configuration"
+        Parameters:
+          - InstanceType
+          - KeyName
+          - InstanceVolume
+      - Label:
+          default: "Network Configuration"
+        Parameters:
+          - VpcId
+          - PrivateSubnet
+          - AllowedCloudflareIPs
+      - Label:
+          default: "Application Configuration"
+        Parameters:
+          - DomainName
+          - CloudflareZoneId
+          - CloudflareAPIToken
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: m6a.large
+    AllowedValues:
+      - m6a.large
+      - m6a.xlarge
+      - m6a.2xlarge
+      - t3.small
+      - t3.medium
+      - t3.large
+    Description: EC2 instance type (m6a series features AMD EPYC processors for better performance)
+
+  InstanceVolume:
+    Type: Number
+    Default: 10
+    MinValue: 4
+    Description: Size of the EBS volume in GB
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair for SSH access
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the resources will be created
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private subnet for the EC2 instance
+
+  DomainName:
+    Type: String
+    Description: Domain name for the AnythingLLM application (e.g., llm.example.com)
+
+  CloudflareZoneId:
+    Type: String
+    Description: Cloudflare Zone ID for the domain
+
+  CloudflareAPIToken:
+    Type: String
+    NoEcho: true
+    Description: Cloudflare API Token with Zone.DNS permissions
+
+  AllowedCloudflareIPs:
+    Type: String
+    Default: "173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22"
+    Description: Comma-separated list of Cloudflare IP ranges
+
+Resources:
+  AnythingLLMSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for AnythingLLM with Cloudflare
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: SSH access
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          Description: HTTP from Cloudflare
+          CidrIp: !Select [0, !Split [",", !Ref AllowedCloudflareIPs]]
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          Description: HTTPS from Cloudflare
+          CidrIp: !Select [0, !Split [",", !Ref AllowedCloudflareIPs]]
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic
+
+  AnythingLLMInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref AnythingLLMSecurityGroup
+      KeyName: !Ref KeyName
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: !Ref InstanceVolume
+            VolumeType: gp3
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y docker
+          systemctl start docker
+          systemctl enable docker
+
+          # Create application directory
+          mkdir -p /home/ec2-user/anythingllm
+          touch /home/ec2-user/anythingllm/.env
+          chown -R ec2-user:ec2-user /home/ec2-user/anythingllm
+
+          # Pull and run AnythingLLM container
+          docker pull mintplexlabs/anythingllm
+          docker run -d \
+            -p 3001:3001 \
+            --cap-add SYS_ADMIN \
+            -v /home/ec2-user/anythingllm:/app/server/storage \
+            -v /home/ec2-user/anythingllm/.env:/app/server/.env \
+            -e STORAGE_DIR="/app/server/storage" \
+            mintplexlabs/anythingllm
+      Tags:
+        - Key: Name
+          Value: AnythingLLM-Cloudflare
+        - Key: Environment
+          Value: Production
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-0a3c3a20c09d6f375
+    us-east-2:
+      AMI: ami-0578f12f0d4eadd5c
+    us-west-1:
+      AMI: ami-0a0a0d06aa0601380
+    us-west-2:
+      AMI: ami-0735c191cf914754d
+    eu-west-1:
+      AMI: ami-0eb11ab33f1ced45e
+    eu-west-2:
+      AMI: ami-0b1b00f4f0d09d131
+    eu-central-1:
+      AMI: ami-0f74c08b8b5efae51
+    ap-southeast-1:
+      AMI: ami-0fb7c14153272b8a7
+    ap-southeast-2:
+      AMI: ami-0d6fb2916ee0ab9fe
+    ap-northeast-1:
+      AMI: ami-0dcd006e5c4d72c1a
+
+Outputs:
+  InstancePrivateIP:
+    Description: Private IP of the AnythingLLM instance
+    Value: !GetAtt AnythingLLMInstance.PrivateIp
+
+  CloudflareSetupInstructions:
+    Description: Next steps for Cloudflare configuration
+    Value: !Sub |
+      1. Add DNS record in Cloudflare:
+         - Type: A
+         - Name: ${DomainName}
+         - Content: ${AnythingLLMInstance.PrivateIp}
+         - Proxy status: Proxied
+
+      2. Configure Cloudflare SSL/TLS:
+         - Set SSL/TLS encryption mode to "Full"
+         - Enable "Always Use HTTPS"
+
+      3. Add page rules (optional):
+         - URL pattern: ${DomainName}/*
+         - Settings: Cache Level: Cache Everything
