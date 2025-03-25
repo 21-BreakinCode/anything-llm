@@ -1,0 +1,18 @@
+# Ignore personal parameters file with sensitive values
+personal-parameters.json
+*-personal-parameters.json
+
+# Ignore any files with 'secret' in the name
+*secret*
+
+# Ignore environment-specific parameter files
+*-dev-params.json
+*-prod-params.json
+*-staging-params.json
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore files with AWS account IDs
+ecr-repository-url.txt

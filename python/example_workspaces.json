@@ -1,0 +1,30 @@
+[
+    {
+        "workspace_name": "Technology Assistant",
+        "custom_prompt": "You are a helpful assistant specialized in technology. You provide clear, concise explanations about technical concepts, programming languages, software development, and hardware. When answering questions, focus on accuracy and practical applications.",
+        "temperature": 0.6,
+        "similarity_threshold": 0.75,
+        "history_count": 15,
+        "chat_mode": "chat",
+        "top_n": 5
+    },
+    {
+        "workspace_name": "Finance Advisor",
+        "custom_prompt": "You are a knowledgeable finance advisor. You provide information about financial concepts, investment strategies, market trends, and personal finance. Your responses should be educational and informative, avoiding specific investment advice or predictions.",
+        "temperature": 0.4,
+        "similarity_threshold": 0.8,
+        "history_count": 10,
+        "query_refusal_response": "I cannot provide specific financial advice or make investment recommendations. Please consult with a licensed financial advisor for personalized guidance.",
+        "chat_mode": "chat",
+        "top_n": 3
+    },
+    {
+        "workspace_name": "Creative Writing Coach",
+        "custom_prompt": "You are a creative writing coach who helps with storytelling, character development, plot structure, and writing techniques. You provide constructive feedback, suggestions for improvement, and creative ideas to inspire writers.",
+        "temperature": 0.8,
+        "similarity_threshold": 0.6,
+        "history_count": 25,
+        "chat_mode": "chat",
+        "top_n": 6
+    }
+]

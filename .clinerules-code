@@ -1,0 +1,84 @@
+# Rules should always be checked everytime
+
+## General Principles
+
+- Split files when they exceed 1,500 lines - Split functions when they become too long
+- Before splitting, review existing usage patterns to ensure no impact on current functionality
+- After each code modification, reflect on its scalability, maintainability, and trade-offs. Provide a brief analysis highlighting potential risks and future optimization directions
+- For UI/UX design, apply the highest design standards like Airbnb & Apple design thinking, maintain design consistency, and prioritize usability
+
+## Error Handling Expectations
+
+1. Error Response Structure
+- All error responses should follow a consistent format:
+
+	```json
+		{
+			"error": {
+			"code": "ERROR_CODE",
+			"message": "Human-readable message",
+			"details": {}, // Additional context when relevant
+			"actionable": true/false // Whether user can resolve
+		}
+
+	```
+
+2. Error Categories
+
+- Input Validation: Clearly specify which field failed and why
+- System Errors: Provide safe error messages without exposing system details
+- Business Logic: Explain the business rule that was violated
+- Rate Limiting: Include retry-after information
+- Authentication/Authorization: Clear distinction between unauthorized/forbidden
+
+3. Recovery Suggestions
+
+- Each error should include actionable steps when possible
+- Provide links to relevant documentation
+- Suggest alternative approaches when available
+
+4. Logging Context
+
+- Include correlation IDs for tracking
+- Log sufficient context for debugging without exposing sensitive data
+- Maintain consistent error codes between response and logs
+
+## Debugging Process
+
+1. Broad Hypothesis - List 5-7 possible root causes, including edge cases, concurrency issues, unexpected dependencies, etc.
+2. First Principles Analysis - Based on system behavior and historical issues, narrow down to 1-2 most likely causes
+3. Leverage Logs for Validation - Insert targeted logs, track data structure changes, validate hypotheses before code modification
+4. Pre-fix Simulation - When feasible, write small mock test scenarios to ensure problem reproducibility
+5. Clarify Requirements - If the issue involves business logic, first inquire about requirements or list assumptions before proceeding with fixes
+
+## Feature Planning and Development Process
+
+1. Comprehensive Scope Understanding
+- Review related code to ensure full context before planning
+- Identify all impact areas: database structure, API changes, UI updates, dependencies
+- Clarify requirements - for business logic issues, inquire about requirements or list assumptions first
+
+2. Raise 4-6 Key Questions
+
+- If requirements are unclear, ask the right questions instead of making assumptions
+- These questions should help uncover missing details, potential trade-offs, and possible edge cases
+
+3. Develop Concrete Plan
+
+- Break down feature development into staged steps
+- Clearly mark dependencies and risks
+- Indicate parts requiring review to ensure confirmation before execution
+
+4. Development Progress Transparency
+
+- Provide brief updates after each stage completion:
+- ✅ Completed
+- 🔄 Next Step
+- ⏳ Remaining Steps
+
+## Code Quality and Performance
+
+- Reference Stripe & Basecamp engineering culture, emphasizing high-quality API design, excellent balance between technical and product experience, focus on "small teams, big impact", and technology choices centered on long-term maintainability and clarity
+- New dependencies must have valid justification, with evaluation of trade-offs and impacts
+- Choose the simplest viable solution rather than the most "complex" or "technically showy" approach
+- Keep functions concise but meaningful - don't split just for the sake of splitting

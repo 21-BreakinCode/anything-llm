@@ -1,5 +1,6 @@
 v-env
 .env
+.venv
 !.env.example
 
 node_modules
@@ -10,3 +11,5 @@ aws_cf_deploy_anything_llm.json
 yarn.lock
 *.bak
 .idea
+
+customize/aws/cloudformation/cloudflare-integrated/parameters.json

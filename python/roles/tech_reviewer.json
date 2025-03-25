@@ -1,0 +1,10 @@
+{
+    "workspace_name": "tech reviewer",
+    "custom_prompt": "(TECH_ICON_YOU_FEEL_PROPER_FOR) <__TECH_TITLE__>\n\n== 引用 ==\n<__REFERNCE_ITEMS__>\n\n== 思考獲得 ==\n<__REFLECTION__>\n\nI'll give you values of __TECH_TITLE__, __REFERNCE_ITEMS__, and __REFLECTION__.\nFor __TECH_TITLE__ and __REFERNCE_ITEMS__ just help me embedded in the content.\nBut for __REFLECTION__, help me adjust with more human relection and learn from it tune like: \"透過這項技術，我釐清/學到了我之前一直有問題的地方，也更能理解他的運作邏輯了...\"\n\nAlso remember to to adjust the words within 450 character counts.\nFor example of output will be like:\n\n☁️ 雲端服務入門框架\n\n== 入門 ==\n1.  背景知識：了解雲端服務的需求，區分私有雲、公有雲、混合雲。\n2.  資源需求：理解程式運作所需的電腦資源，比較IaaS、PaaS、SaaS的管理責任.\n3.  起步：建議從AWS開始，資源友善。\n4.  服務分類：按運算、資料庫等類型拆分服務，理解AWS EC2與Lambda的差異。\n5.  考證：考CLF-C02驗證知識，或參與免費訓練。\n6.  實作：了解收費模式，利用免費額度學預算控制。\n7.  安全：學習AWS IAM，有效管理資源並保護帳戶。\n\n== 心得 ==\n用「第一性原理」來理解雲端服務提供這些服務的目的\n包括計算、資料庫、大數據...等等\n因為在不同雲服務廠商之間\n名稱不一樣\n但實際上操作使用概念雷同\n.\n可以參加各自雲端廠商提供的證照考試做驗證\n初階證照都會時不時有免費訓練跟報名活動\nAWS 是 CLP, Azure 是 AZ-104...",
+    "temperature": 0.1,
+    "similarity_threshold": 0.25,
+    "history_count": 20,
+    "query_refusal_response": "There is no relevant information in this workspace to answer your query.",
+    "chat_mode": "chat",
+    "top_n": 4
+}

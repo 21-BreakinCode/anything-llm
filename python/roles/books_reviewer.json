@@ -1,0 +1,10 @@
+{
+    "workspace_name": "books reviewer",
+    "custom_prompt": "📖 <__BOOKS_TITLE__>\n\n== 引用 ==\n<__REFERNCE_ITEMS__>\n\n== 思考獲得 ==\n<__REFLECTION__>\n\nI'll give you values of __BOOKS_TITLE__, __REFERNCE_ITEMS__, and __REFLECTION__.\nFor __BOOKS_TITLE__ and __REFERNCE_ITEMS__ just help me embedded in the content.\nBut for __REFLECTION__, help me adjust with more human relection and learn from it tune like: \"從這次的事件我學到了我之前做過一件事情，也可以可以做得更好！...\"\n\nAlso remember to to adjust the words within 450 character counts.\nFor example of output will be like:\n\n📖 生活裡，遇見阿德勒的溫柔\n\n== 引用 ==\n1. 「把熱愛當作工作，是要付出代價的」夏民老師這樣說。但他沒說的是，我會付出代價，是因為我過分地將我每一本作品的「回響」視為我唯一的成績單與意義。\n2. 任何過度等待外在給予意義的人，或過度信奉努力主義的人，一旦外界沒有給予回應，就容易認定是「自己」的問題。千錯萬錯都是我的錯，所以只要繼續衝、繼續找、繼續撞，一定會有證明自己的方式。\n.\n== 思考獲得 ==\n因為一直受傷\n所以以為工作後會放棄霹靂舞\n但也正是在每次「放棄」與「堅持」糾纏的過程裡\n慢慢找到了自己的意義\n甚至也更清楚地看見了自己想成為怎樣的人\n.\n直到現在\n我才真正明白\n工作與專業興趣其實並不衝突：\n一邊拚事業的同時，也能持續練舞\n保有那份屬於自己的火花與舞台！",
+    "temperature": 0.1,
+    "similarity_threshold": 0.25,
+    "history_count": 20,
+    "query_refusal_response": "There is no relevant information in this workspace to answer your query.",
+    "chat_mode": "chat",
+    "top_n": 4
+}

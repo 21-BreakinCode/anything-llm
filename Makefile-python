@@ -1,0 +1,56 @@
+.PHONY: help create-roles list-workspaces create-workspace create-from-file
+
+# Colors for pretty output
+BLUE := \033[34m
+GREEN := \033[32m
+RED := \033[31m
+YELLOW := \033[33m
+RESET := \033[0m
+
+# Default values
+ENDPOINT ?= http://localhost:3001
+API_KEY ?=
+
+help:
+	@echo "$(BLUE)AnythingLLM Python Workspace Manager$(RESET)"
+	@echo ""
+	@echo "Available commands:"
+	@echo "  $(GREEN)help$(RESET)                - Show this help message"
+	@echo "  $(GREEN)create-roles$(RESET)        - Create workspaces from all JSON files in the roles directory"
+	@echo "  $(GREEN)list-workspaces$(RESET)     - List all workspaces"
+	@echo "  $(GREEN)create-workspace$(RESET)    - Create a workspace from JSON string"
+	@echo "  $(GREEN)create-from-file$(RESET)    - Create workspaces from a JSON file"
+	@echo ""
+	@echo "Usage examples:"
+	@echo "  make -f Makefile-python create-roles ENDPOINT=https://your-endpoint API_KEY=your-api-key"
+	@echo "  make -f Makefile-python list-workspaces ENDPOINT=https://your-endpoint API_KEY=your-api-key"
+	@echo ""
+
+# Ensure endpoint has protocol
+define ensure_protocol
+$(shell echo $(1) | grep -q "^https\?://" && echo $(1) || echo "https://$(1)")
+endef
+
+create-roles:
+	@echo "$(BLUE)Creating workspaces from roles directory...$(RESET)"
+	@cd python && python -m main --endpoint $(call ensure_protocol,$(ENDPOINT)) $(if $(API_KEY),--api-key $(API_KEY),) create-from-roles
+
+list-workspaces:
+	@echo "$(BLUE)Listing workspaces...$(RESET)"
+	@cd python && python -m main --endpoint $(call ensure_protocol,$(ENDPOINT)) $(if $(API_KEY),--api-key $(API_KEY),) list
+
+create-workspace:
+	@echo "$(RED)Error: JSON string required.$(RESET)"
+	@echo "Usage: make -f Makefile-python create-workspace JSON='{\"workspace_name\":\"My Workspace\",\"custom_prompt\":\"You are a helpful assistant.\"}' ENDPOINT=your-endpoint API_KEY=your-api-key"
+	@if [ -n "$(JSON)" ]; then \
+		echo "$(BLUE)Creating workspace...$(RESET)"; \
+		cd python && python -m main --endpoint $(call ensure_protocol,$(ENDPOINT)) $(if $(API_KEY),--api-key $(API_KEY),) create '$(JSON)'; \
+	fi
+
+create-from-file:
+	@echo "$(RED)Error: File path required.$(RESET)"
+	@echo "Usage: make -f Makefile-python create-from-file FILE=path/to/file.json ENDPOINT=your-endpoint API_KEY=your-api-key"
+	@if [ -n "$(FILE)" ]; then \
+		echo "$(BLUE)Creating workspaces from file...$(RESET)"; \
+		cd python && python -m main --endpoint $(call ensure_protocol,$(ENDPOINT)) $(if $(API_KEY),--api-key $(API_KEY),) create-from-file $(FILE); \
+	fi
